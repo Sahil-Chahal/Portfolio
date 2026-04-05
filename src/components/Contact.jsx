@@ -3,19 +3,34 @@ import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
 const socials = [
   {
-    label: 'Email',
-    href: 'mailto:chahal.sahil0102@gmail.com',
-    display: 'chahal.sahil0102@gmail.com',
+    label: 'LinkedIn',
+    href: 'https://linkedin.com/in/sahilchahal01',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+        <rect x="2" y="9" width="4" height="12"/>
+        <circle cx="4" cy="4" r="2"/>
+      </svg>
+    ),
   },
   {
     label: 'GitHub',
     href: 'https://github.com/Sahil-Chahal',
-    display: 'github.com/Sahil-Chahal',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+      </svg>
+    ),
   },
   {
-    label: 'LinkedIn',
-    href: 'https://linkedin.com/in/sahilchahal01',
-    display: 'linkedin.com/in/sahilchahal01',
+    label: 'Email',
+    href: 'mailto:chahal.sahil0102@gmail.com',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="4" width="20" height="16" rx="2"/>
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+      </svg>
+    ),
   },
 ]
 
@@ -43,9 +58,31 @@ export default function Contact() {
         </h2>
         <div className="animate-on-scroll stagger-1 mt-2 w-12 h-px bg-black dark:bg-white mx-auto" />
 
-        <div className="mt-16 grid md:grid-cols-2 gap-12 md:gap-16">
+        {/* Social Icons with hover labels */}
+        <div className="animate-on-scroll stagger-2 flex items-center justify-center gap-8 mt-8">
+          {socials.map(social => (
+            <a
+              key={social.label}
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative group flex flex-col items-center"
+            >
+              {/* Hover label */}
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-medium tracking-wide opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 whitespace-nowrap pointer-events-none">
+                {social.label}
+              </span>
+              {/* Icon */}
+              <span className="text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors duration-300 group-hover:-translate-y-1 transform transition-transform">
+                {social.icon}
+              </span>
+            </a>
+          ))}
+        </div>
+
+        <div className="mt-12 max-w-xl mx-auto">
           {/* Form */}
-          <form onSubmit={handleSubmit} className="animate-on-scroll from-left stagger-2 space-y-5">
+          <form onSubmit={handleSubmit} className="animate-on-scroll from-left stagger-3 space-y-5">
             <div>
               <label htmlFor="contact-name" className="block text-xs uppercase tracking-widest text-gray-500 mb-2">
                 Name
@@ -99,32 +136,6 @@ export default function Contact() {
               {submitted ? 'Message Sent!' : 'Send Message'}
             </button>
           </form>
-
-          {/* Social Links */}
-          <div className="animate-on-scroll from-right stagger-3 flex flex-col justify-center space-y-6">
-            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              Feel free to reach out for collaborations, opportunities, or just to say hello. I'm always open to connecting with like-minded people.
-            </p>
-
-            <div className="space-y-4">
-              {socials.map(social => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block group"
-                >
-                  <span className="text-xs uppercase tracking-widest text-gray-500">
-                    {social.label}
-                  </span>
-                  <span className="block text-sm font-medium mt-0.5 group-hover:underline underline-offset-4">
-                    {social.display}
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </section>

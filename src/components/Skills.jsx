@@ -7,7 +7,7 @@ const skillCategories = [
   },
   {
     title: 'Automation & AI',
-    skills: ['n8n', 'Hugging Face', 'Notion API', 'Inngest'],
+    skills: ['n8n', 'Hugging Face'],
   },
   {
     title: 'Management Skills',

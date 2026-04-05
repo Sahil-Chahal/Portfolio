@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 const navLinks = [
   { label: 'Home', href: '#home' },
@@ -13,11 +13,36 @@ const navLinks = [
 export default function Navbar({ darkMode, toggleDarkMode }) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('#home')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Track active section with IntersectionObserver
+  useEffect(() => {
+    const sectionIds = navLinks.map(l => l.href.replace('#', ''))
+    const observers = []
+
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id)
+      if (!el) return
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActiveSection(`#${id}`)
+          }
+        },
+        { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
+      )
+      observer.observe(el)
+      observers.push(observer)
+    })
+
+    return () => observers.forEach(obs => obs.disconnect())
   }, [])
 
   useEffect(() => {
@@ -28,6 +53,39 @@ export default function Navbar({ darkMode, toggleDarkMode }) {
     }
     return () => { document.body.style.overflow = '' }
   }, [mobileOpen])
+
+  const handleNavClick = useCallback((e, href) => {
+    e.preventDefault()
+    setMobileOpen(false)
+    const target = document.querySelector(href)
+    if (target) {
+      const navHeight = 64
+      const targetPosition = target.getBoundingClientRect().top + window.scrollY - navHeight
+      const startPosition = window.scrollY
+      const distance = targetPosition - startPosition
+      const duration = 1000
+      let startTime = null
+
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+      }
+
+      function animation(currentTime) {
+        if (startTime === null) startTime = currentTime
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const ease = easeInOutCubic(progress)
+
+        window.scrollTo(0, startPosition + distance * ease)
+
+        if (progress < 1) {
+          requestAnimationFrame(animation)
+        }
+      }
+
+      requestAnimationFrame(animation)
+    }
+  }, [])
 
   return (
     <nav
@@ -40,21 +98,39 @@ export default function Navbar({ darkMode, toggleDarkMode }) {
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <a href="#home" className="text-xl font-bold tracking-tight select-none">
+        <a
+          href="#home"
+          onClick={(e) => handleNavClick(e, '#home')}
+          className="text-xl font-bold tracking-tight select-none"
+        >
           SC
         </a>
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map(link => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map(link => {
+            const isActive = activeSection === link.href
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
+                className={`nav-link relative text-sm transition-all duration-300 ${
+                  isActive
+                    ? 'font-bold text-black dark:text-white scale-105'
+                    : 'font-medium text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                }`}
+                style={{ display: 'inline-block', transformOrigin: 'center' }}
+              >
+                {link.label}
+                <span
+                  className={`absolute -bottom-1 left-0 h-[2px] bg-black dark:bg-white transition-all duration-300 ${
+                    isActive ? 'w-full' : 'w-0'
+                  }`}
+                />
+              </a>
+            )
+          })}
         </div>
 
         {/* Right Actions */}
@@ -124,16 +200,23 @@ export default function Navbar({ darkMode, toggleDarkMode }) {
         }`}
       >
         <div className="flex flex-col items-center gap-6 pt-12">
-          {navLinks.map(link => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="text-lg font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map(link => {
+            const isActive = activeSection === link.href
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
+                className={`text-lg transition-all duration-300 ${
+                  isActive
+                    ? 'font-bold text-black dark:text-white'
+                    : 'font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                }`}
+              >
+                {link.label}
+              </a>
+            )
+          })}
           <a
             href="/resume.pdf"
             target="_blank"
